@@ -1,0 +1,17 @@
+.approval-action {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 480px;
+}
+
+.approval-action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.approval-hint {
+  font-size: 12px;
+  color: var(--color-danger);
+  margin: 0;
+}

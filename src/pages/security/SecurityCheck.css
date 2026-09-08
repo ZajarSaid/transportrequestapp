@@ -1,0 +1,83 @@
+.security-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.security-queue {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.security-panel {
+  min-width: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+
+.gate-details {
+  margin-bottom: 20px;
+}
+
+.gate-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px 24px;
+}
+
+.gate-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.gate-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--color-text-light);
+}
+
+.gate-value {
+  font-size: 14px;
+  color: var(--color-text-dark);
+}
+
+.gate-form {
+  border-top: 1px solid var(--color-border);
+  padding-top: 20px;
+}
+
+.gate-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.gate-comment {
+  grid-column: 1 / -1;
+}
+
+.gate-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+@media (max-width: 900px) {
+  .security-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .gate-form-grid,
+  .gate-grid {
+    grid-template-columns: 1fr;
+  }
+}

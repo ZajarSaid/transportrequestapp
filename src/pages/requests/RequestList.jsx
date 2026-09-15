@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useRequests } from '../../hooks/useRequests'
 import { useToast } from '../../components/Toast'
 import StatusBadge from '../../components/StatusBadge'
+import ConfirmModal from '../../components/ConfirmModal'
 import { REQUEST_STATUSES } from '../../utils/statusConfig'
 import './RequestList.css'
 
@@ -9,6 +11,7 @@ function RequestList() {
   const { requests, loading, error, submitRequest, removeRequest, resetRequests } =
     useRequests()
   const toast = useToast()
+  const [confirmAction, setConfirmAction] = useState(null)
 
   if (loading) {
     return (
@@ -41,21 +44,32 @@ function RequestList() {
   }
 
   const handleDelete = (req) => {
-    const confirmed = window.confirm(
-      `Delete draft ${req.referenceNumber}? This action cannot be undone.`,
-    )
-    if (!confirmed) return
-    removeRequest(req.id)
-    toast.success(`Draft ${req.referenceNumber} deleted.`)
+    setConfirmAction({
+      type: 'delete',
+      request: req,
+      title: 'Delete request',
+      message: `Delete draft ${req.referenceNumber}? This action cannot be undone.`,
+    })
   }
 
   const handleReset = () => {
-    const confirmed = window.confirm(
-      'Delete all requests? This cannot be undone.',
-    )
-    if (!confirmed) return
-    resetRequests()
-    toast.success('All requests deleted.')
+    setConfirmAction({
+      type: 'reset',
+      title: 'Delete all requests',
+      message: 'Delete all requests? This cannot be undone.',
+    })
+  }
+
+  const handleConfirm = () => {
+    if (!confirmAction) return
+    if (confirmAction.type === 'delete') {
+      removeRequest(confirmAction.request.id)
+      toast.success(`Draft ${confirmAction.request.referenceNumber} deleted.`)
+    } else {
+      resetRequests()
+      toast.success('All requests deleted.')
+    }
+    setConfirmAction(null)
   }
 
   return (
@@ -139,6 +153,17 @@ function RequestList() {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        open={Boolean(confirmAction)}
+        title={confirmAction?.title}
+        message={confirmAction?.message}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        danger
+        onConfirm={handleConfirm}
+        onCancel={() => setConfirmAction(null)}
+      />
     </div>
   )
 }

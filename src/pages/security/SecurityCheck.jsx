@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useRequests } from '../../hooks/useRequests'
 import { useFleet } from '../../hooks/useFleet'
+import { useToast } from '../../components/Toast'
 import StatusBadge from '../../components/StatusBadge'
 import { REQUEST_STATUSES } from '../../utils/statusConfig'
 import './SecurityCheck.css'
@@ -11,9 +12,8 @@ const GATE_STATUSES = ['Cleared', 'Held']
 function SecurityCheck() {
   const { requests, recordSecurityCheck } = useRequests()
   const { vehicles, drivers } = useFleet()
+  const toast = useToast()
   const [selectedId, setSelectedId] = useState(null)
-  const [message, setMessage] = useState(null)
-  const [error, setError] = useState(null)
 
   const eligible = requests.filter(
     (r) => r.status === REQUEST_STATUSES.READY_FOR_TRIP,
@@ -24,17 +24,19 @@ function SecurityCheck() {
 
   const handleCheck = (check) => {
     if (!selected) return
-    setError(null)
-    setMessage(null)
     try {
       const updated = recordSecurityCheck(selected.id, check)
-      setMessage(
-        check.gateStatus === 'Cleared'
-          ? `Request ${updated.referenceNumber} cleared — trip completed.`
-          : `Request ${updated.referenceNumber} held for review.`,
-      )
+      if (check.gateStatus === 'Cleared') {
+        toast.success(
+          `Request ${updated.referenceNumber} cleared — trip completed.`,
+        )
+      } else {
+        toast.warning(
+          `Request ${updated.referenceNumber} held for review.`,
+        )
+      }
     } catch (err) {
-      setError(err.message)
+      toast.error(err.message)
     }
   }
 
@@ -48,9 +50,6 @@ function SecurityCheck() {
           </p>
         </div>
       </div>
-
-      {message && <div className="action-message success">{message}</div>}
-      {error && <div className="action-message error">{error}</div>}
 
       {eligible.length === 0 ? (
         <div className="empty-state card">

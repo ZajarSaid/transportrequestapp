@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useRequests } from '../../hooks/useRequests'
+import { useToast } from '../../components/Toast'
 import RequestSummaryCard from '../../components/RequestSummaryCard'
 import ApprovalAction from '../../components/ApprovalAction'
 import StatusBadge from '../../components/StatusBadge'
@@ -8,9 +9,9 @@ import './ApprovalPage.css'
 
 function LeaderApproval() {
   const { requests, setLeaderApproval } = useRequests()
+  const toast = useToast()
   const [selectedId, setSelectedId] = useState(null)
   const [busy, setBusy] = useState(false)
-  const [message, setMessage] = useState(null)
 
   const pending = requests.filter((r) =>
     [REQUEST_STATUSES.SUBMITTED, REQUEST_STATUSES.PENDING_LEADER].includes(
@@ -24,7 +25,6 @@ function LeaderApproval() {
   const handleAction = (approved) => (decision) => {
     if (!selected) return
     setBusy(true)
-    setMessage(null)
     const approval = {
       approved,
       comment: decision.comment || '',
@@ -33,7 +33,7 @@ function LeaderApproval() {
     }
     const updated = setLeaderApproval(selected.id, approval)
     setBusy(false)
-    setMessage(
+    toast.success(
       `Request ${updated.referenceNumber} was ${
         approved ? 'approved & recommended' : 'rejected'
       }.`,
@@ -52,8 +52,6 @@ function LeaderApproval() {
           </p>
         </div>
       </div>
-
-      {message && <div className="action-message success">{message}</div>}
 
       {pending.length === 0 ? (
         <div className="empty-state card">

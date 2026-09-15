@@ -1,0 +1,51 @@
+=== SIDEBAR COMPONENT ANALYSIS ===
+
+The Sidebar is implemented as a single, flat component — there are NO sub-components. Everything lives in two files:
+
+FILES:
+  src/components/Sidebar.jsx    - Component logic + markup
+  src/components/Sidebar.css    - All styling
+  src/layouts/MainLayout.jsx    - Parent that controls open/close state
+
+ARCHITECTURE:
+
+The Sidebar is stateless — it receives `isOpen` and `onClose` as props from MainLayout.jsx (lines 8-11).
+The state (sidebarOpen) lives in MainLayout and is toggled by the TopNav hamburger button.
+
+Key logic in Sidebar.jsx:
+  1. handleLinkClick (line 5-7):
+     On mobile (<=768px), it auto-closes the sidebar when a nav link is clicked.
+
+  2. Active state:
+     Each NavLink uses react-router-dom's `isActive` callback (e.g. line 19)
+     to apply the `active` CSS class.
+
+  3. Mobile toggle:
+     The `sidebar-open` class (line 10) is conditionally applied based on `isOpen`.
+
+Key layout logic in MainLayout.jsx:
+  1. Line 15:
+     A clickable overlay (sidebar-overlay) is rendered only when the sidebar is open,
+     which closes it on click.
+
+  2. Line 18:
+     TopNav receives a onMenuToggle callback to toggle the state.
+
+NAV SECTIONS (hardcoded, not data-driven):
+  - Main        -> Dashboard (/)
+  - Applicant   -> My Requests (/requests), New Request (/requests/new)
+  - Approvals   -> Leader Approval (/approvals/leader), Accountant Approval (/approvals/accountant)
+  - Transport   -> Transport Dashboard (/transport), Vehicles (/transport/vehicles), Drivers (/transport/drivers)
+  - Security    -> Security Gate (/security)
+  - Administration -> Admin Dashboard (/admin), All Requests (/admin/requests)
+
+PROPS:
+  - isOpen (boolean)  : Controls whether sidebar-open class is applied
+  - onClose (function) : Called on link click on mobile to close sidebar
+
+STYLING (Sidebar.css):
+  - Fixed position, 260px width, full viewport height
+  - Dark theme (#1a1f36 background)
+  - Active links get blue left border + blue text highlight
+  - Section titles are uppercase, small font, muted color
+  - Smooth hover transitions on nav links

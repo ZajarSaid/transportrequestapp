@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useRequests } from '../../hooks/useRequests'
+import { useToast } from '../../components/Toast'
 import RequestSummaryCard from '../../components/RequestSummaryCard'
 import ApprovalAction from '../../components/ApprovalAction'
 import StatusBadge from '../../components/StatusBadge'
@@ -9,9 +10,9 @@ import './ApprovalPage.css'
 
 function AccountantApproval() {
   const { requests, setFundsConfirmation } = useRequests()
+  const toast = useToast()
   const [selectedId, setSelectedId] = useState(null)
   const [busy, setBusy] = useState(false)
-  const [message, setMessage] = useState(null)
 
   const pending = requests.filter(
     (r) => r.status === REQUEST_STATUSES.PENDING_FUNDS,
@@ -23,7 +24,6 @@ function AccountantApproval() {
   const handleAction = (fundsAvailable) => (decision) => {
     if (!selected) return
     setBusy(true)
-    setMessage(null)
     const branch = branches.find((b) => b.id === selected.applicant?.branch)
     const project = projects.find(
       (p) => p.id === selected.applicant?.projectUnit,
@@ -39,7 +39,7 @@ function AccountantApproval() {
     }
     const updated = setFundsConfirmation(selected.id, confirmation)
     setBusy(false)
-    setMessage(
+    toast.success(
       `Request ${updated.referenceNumber}: funds ${
         fundsAvailable ? 'confirmed' : 'marked unavailable'
       }.`,
@@ -57,8 +57,6 @@ function AccountantApproval() {
           </p>
         </div>
       </div>
-
-      {message && <div className="action-message success">{message}</div>}
 
       {pending.length === 0 ? (
         <div className="empty-state card">

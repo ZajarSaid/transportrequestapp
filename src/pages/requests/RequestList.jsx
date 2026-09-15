@@ -1,6 +1,6 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useRequests } from '../../hooks/useRequests'
+import { useToast } from '../../components/Toast'
 import StatusBadge from '../../components/StatusBadge'
 import { REQUEST_STATUSES } from '../../utils/statusConfig'
 import './RequestList.css'
@@ -8,8 +8,7 @@ import './RequestList.css'
 function RequestList() {
   const { requests, loading, error, submitRequest, removeRequest, resetRequests } =
     useRequests()
-  const [message, setMessage] = useState(null)
-  const [errorMsg, setErrorMsg] = useState(null)
+  const toast = useToast()
 
   if (loading) {
     return (
@@ -31,38 +30,32 @@ function RequestList() {
   }
 
   const handleSubmit = (req) => {
-    setMessage(null)
-    setErrorMsg(null)
     try {
       const updated = submitRequest(req.id)
-      setMessage(
+      toast.success(
         `Request ${updated.referenceNumber} submitted and is now waiting for leader recommendation.`,
       )
     } catch (err) {
-      setErrorMsg(err.message)
+      toast.error(err.message)
     }
   }
 
   const handleDelete = (req) => {
-    setMessage(null)
-    setErrorMsg(null)
     const confirmed = window.confirm(
       `Delete draft ${req.referenceNumber}? This action cannot be undone.`,
     )
     if (!confirmed) return
     removeRequest(req.id)
-    setMessage(`Draft ${req.referenceNumber} deleted.`)
+    toast.success(`Draft ${req.referenceNumber} deleted.`)
   }
 
   const handleReset = () => {
-    setMessage(null)
-    setErrorMsg(null)
     const confirmed = window.confirm(
       'Delete all requests? This cannot be undone.',
     )
     if (!confirmed) return
     resetRequests()
-    setMessage('All requests deleted.')
+    toast.success('All requests deleted.')
   }
 
   return (
@@ -78,9 +71,6 @@ function RequestList() {
           </Link>
         </div>
       </div>
-
-      {message && <div className="action-message success">{message}</div>}
-      {errorMsg && <div className="action-message error">{errorMsg}</div>}
 
       {requests.length === 0 ? (
         <div className="empty-state card">

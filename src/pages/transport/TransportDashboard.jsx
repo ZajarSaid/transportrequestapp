@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useRequests } from '../../hooks/useRequests'
 import { useFleet } from '../../hooks/useFleet'
+import { useToast } from '../../components/Toast'
 import RequestSummaryCard from '../../components/RequestSummaryCard'
 import StatusBadge from '../../components/StatusBadge'
 import {
@@ -16,9 +17,8 @@ import './TransportDashboard.css'
 function TransportDashboard() {
   const { requests, allocateTransport, approveTransport } = useRequests()
   const { vehicles, drivers } = useFleet()
+  const toast = useToast()
   const [selectedId, setSelectedId] = useState(null)
-  const [message, setMessage] = useState(null)
-  const [error, setError] = useState(null)
 
   const eligible = requests.filter((r) =>
     [
@@ -32,22 +32,18 @@ function TransportDashboard() {
 
   const handleAllocate = (allocation) => {
     if (!selected) return
-    setError(null)
-    setMessage(null)
     try {
       const updated = allocateTransport(selected.id, allocation)
-      setMessage(
+      toast.success(
         `Request ${updated.referenceNumber}: vehicle and driver allocated.`,
       )
     } catch (err) {
-      setError(err.message)
+      toast.error(err.message)
     }
   }
 
   const handleApprove = (approved) => {
     if (!selected) return
-    setError(null)
-    setMessage(null)
     try {
       const updated = approveTransport(selected.id, {
         approved,
@@ -55,13 +51,13 @@ function TransportDashboard() {
         date: new Date().toISOString(),
         comment: '',
       })
-      setMessage(
+      toast.success(
         `Request ${updated.referenceNumber}: transport ${
           approved ? 'approved — ready for trip.' : 'rejected.'
         }`,
       )
     } catch (err) {
-      setError(err.message)
+      toast.error(err.message)
     }
   }
 
@@ -75,9 +71,6 @@ function TransportDashboard() {
           </p>
         </div>
       </div>
-
-      {message && <div className="action-message success">{message}</div>}
-      {error && <div className="action-message error">{error}</div>}
 
       <div className="transport-layout">
         <div className="transport-main">
